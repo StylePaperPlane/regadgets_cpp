@@ -88,43 +88,17 @@ struct hmac_result {
 };
 ```
 
-## 3. 快速开始
 
-```cpp
-#include "regadgets/regadgets.hpp"
-#include <iostream>
+## 3. API 调用说明
 
-int main() {
-    using namespace regadgets;
-
-    auto plain = from_string("hello");
-
-    std::cout << encode_b64(plain) << '\n';
-    std::cout << to_hex(sha256(plain)) << '\n';
-
-    aes_options options;
-    options.mode = block_mode::cbc;
-    options.iv = from_hex("00112233445566778899aabbccddeeff");
-
-    auto key = from_string("0123456789abcdef");
-    auto cipher = aes128_encrypt(plain, key, options);
-    auto back = aes128_decrypt(cipher, key, options);
-
-    std::cout << to_hex(cipher) << '\n';
-    std::cout << to_string(back) << '\n';
-}
-```
-
-## 4. API 调用说明
-
-### 4.1 位运算与数据转换
+### 3.1 位运算与数据转换
 
 头文件：
 
 - `regadgets/bitwise/data_conversion.hpp`
 - `regadgets/bitwise/bit_operations.hpp`
 
-#### 4.1.1 字符串 / 十六进制 / 字节转换
+#### 3.1.1 字符串 / 十六进制 / 字节转换
 
 ```cpp
 bytes from_string(std::string_view input);
@@ -142,7 +116,7 @@ auto raw2 = from_hex(hex);
 auto text = to_string(raw2);
 ```
 
-#### 4.1.2 整数与字节序转换
+#### 3.1.2 整数与字节序转换
 
 ```cpp
 std::uint16_t bytes_to_word(std::span<const byte> input, bool little_endian = true);
@@ -167,7 +141,7 @@ auto packed = pack_dword(std::array<std::uint32_t, 2>{1u, 2u});
 auto unpacked = unpack_dword(packed);
 ```
 
-#### 4.1.3 循环位移与按位异或
+#### 3.1.3 循环位移与按位异或
 
 ```cpp
 template <typename T>
@@ -193,11 +167,11 @@ auto z = bxor(from_hex("aabbccdd"), from_hex("01020304"));
 auto roundtrip = bxorr_dec(bxorr_enc(from_string("hello"), 0x5a), 0x5a);
 ```
 
-### 4.2 编码算法
+### 3.2 编码算法
 
 头文件目录：`regadgets/encoding/`
 
-#### 4.2.1 Base16 / Base32 / Base45 / Base58 / Base62 / Base64 / Base85 / Base91 / Base92
+#### 3.2.1 Base16 / Base32 / Base45 / Base58 / Base62 / Base64 / Base85 / Base91 / Base92
 
 统一接口风格：
 
@@ -234,7 +208,7 @@ auto raw64 = decode_b64(b64);
 auto raw85 = decode_b85(b85);
 ```
 
-#### 4.2.2 Base2048
+#### 3.2.2 Base2048
 
 头文件：`regadgets/encoding/base2048.hpp`
 
@@ -257,11 +231,11 @@ auto encoded = encode_b2048(from_string("hello"), alphabet);
 auto decoded = decode_b2048(encoded, alphabet);
 ```
 
-### 4.3 流密码
+### 3.3 流密码
 
 头文件目录：`regadgets/crypto/stream/`
 
-#### 4.3.1 RC4
+#### 3.3.1 RC4
 
 ```cpp
 rc4_state rc4_init(std::span<const byte> key);
@@ -279,7 +253,7 @@ auto cipher = rc4_crypt(rc4_init(from_string("rc4-key")), from_string("hello"));
 auto plain = rc4_crypt(rc4_init(from_string("rc4-key")), cipher);
 ```
 
-#### 4.3.2 Salsa20
+#### 3.3.2 Salsa20
 
 ```cpp
 bytes salsa20_crypt(std::span<const byte> key,
@@ -304,7 +278,7 @@ auto cipher = salsa20_crypt(key, nonce, 1, from_string("hello"));
 auto plain = salsa20_crypt(key, nonce, 1, cipher);
 ```
 
-#### 4.3.3 ChaCha20
+#### 3.3.3 ChaCha20
 
 ```cpp
 bytes chacha20_crypt(std::span<const byte> key,
@@ -329,11 +303,11 @@ auto cipher = chacha20_crypt(key, nonce, 1, from_string("hello"));
 auto plain = chacha20_crypt(key, nonce, 1, cipher);
 ```
 
-### 4.4 分组密码与对称加密
+### 3.4 分组密码与对称加密
 
 头文件目录：`regadgets/crypto/block/`
 
-#### 4.4.1 TEA
+#### 3.4.1 TEA
 
 单块接口：
 
@@ -374,7 +348,7 @@ auto cipher = tea_encrypt(from_string("tea demo"), key);
 auto plain = tea_decrypt(cipher, key);
 ```
 
-#### 4.4.2 XTEA
+#### 3.4.2 XTEA
 
 单块接口：
 
@@ -411,7 +385,7 @@ auto cipher = xtea_encrypt(from_string("xtea demo"), key);
 auto plain = xtea_decrypt(cipher, key);
 ```
 
-#### 4.4.3 XXTEA
+#### 3.4.3 XXTEA
 
 ```cpp
 bytes xxtea_encrypt(std::span<const byte> input,
@@ -434,7 +408,7 @@ auto cipher = xxtea_encrypt(from_string("hello"), key, options);
 auto plain = xxtea_decrypt(cipher, key, options);
 ```
 
-#### 4.4.4 RC5
+#### 3.4.4 RC5
 
 ```cpp
 bytes rc5_encrypt(std::span<const byte> input,
@@ -460,7 +434,7 @@ auto cipher = rc5_encrypt(from_string("hello"), from_string("rc5-key"));
 auto plain = rc5_decrypt(cipher, from_string("rc5-key"));
 ```
 
-#### 4.4.5 AES
+#### 3.4.5 AES
 
 ```cpp
 struct aes_params {
@@ -557,7 +531,7 @@ auto plain = aes128_decrypt(cipher, key, params, options);
 目前仅aes支持传参的方式定制魔改，后续会考虑所有的算法都优化成可自定义组件这种类型的代码
 
 
-#### 4.4.6 DES
+#### 3.4.6 DES
 
 ```cpp
 bytes des_encrypt(std::span<const byte> input,
@@ -585,7 +559,7 @@ auto cipher = des_encrypt(from_string("DES stream demo"), key, block_mode::cbc, 
 auto plain = des_decrypt(cipher, key, block_mode::cbc, iv);
 ```
 
-#### 4.4.7 3DES
+#### 3.4.7 3DES
 
 ```cpp
 bytes tripledes_encrypt(std::span<const byte> input,
@@ -612,7 +586,7 @@ auto cipher = tripledes_encrypt(from_string("DES stream demo"), key, block_mode:
 auto plain = tripledes_decrypt(cipher, key, block_mode::cbc, iv);
 ```
 
-#### 4.4.8 Blowfish
+#### 3.4.8 Blowfish
 
 ```cpp
 bytes blowfish_encrypt(std::span<const byte> input,
@@ -640,7 +614,7 @@ auto cipher = blowfish_encrypt(from_string("DES stream demo"), key, block_mode::
 auto plain = blowfish_decrypt(cipher, key, block_mode::cbc, iv);
 ```
 
-#### 4.4.9 SM4
+#### 3.4.9 SM4
 
 块接口：
 
@@ -686,11 +660,11 @@ auto plain = sm4_cbc_decrypt(cipher,
                              std::span<const byte, 16>(iv.data(), 16));
 ```
 
-### 4.5 哈希 / 摘要 / HMAC
+### 3.5 哈希 / 摘要 / HMAC
 
 头文件目录：`regadgets/hash/`
 
-#### 4.5.1 MD5 / SHA1 / SHA256 / SHA512
+#### 3.5.1 MD5 / SHA1 / SHA256 / SHA512
 
 ```cpp
 bytes md5(std::span<const byte> input);
@@ -710,7 +684,7 @@ auto sha256_hex = to_hex(sha256(plain));
 auto sha512_hex = to_hex(sha512(plain));
 ```
 
-#### 4.5.2 CRC / Adler
+#### 3.5.2 CRC / Adler
 
 ```cpp
 std::uint32_t crc32(std::span<const byte> input, std::uint32_t seed = 0xFFFFFFFFu);
@@ -727,7 +701,7 @@ auto c64 = crc64(plain);
 auto adler = adler32(plain);
 ```
 
-#### 4.5.3 HMAC
+#### 3.5.3 HMAC
 
 ```cpp
 hmac_result hmac_md5(std::span<const byte> key, std::span<const byte> message);
@@ -742,11 +716,11 @@ auto result = hmac_sha256(from_string("secret"), from_string("hello"));
 std::cout << result.hex << '\n';
 ```
 
-### 4.6 数学与矩阵算法
+### 3.6 数学与矩阵算法
 
 头文件目录：`regadgets/math/`
 
-#### 4.6.1 DCT / IDCT
+#### 3.6.1 DCT / IDCT
 
 ```cpp
 std::vector<double> dct_transform(std::span<const double> input);
@@ -760,7 +734,7 @@ auto dct = dct_transform(std::vector<double>{1.0, 2.0, 3.0, 4.0});
 auto idct = idct_transform(dct);
 ```
 
-#### 4.6.2 矩阵
+#### 3.6.2 矩阵
 
 ```cpp
 matrix matrix_multiply(const matrix& lhs, const matrix& rhs);
@@ -785,11 +759,11 @@ auto square = generate_matrix_square(3, 2.0, 0.5);
 auto flat = flat_matrix(square);
 ```
 
-### 4.7 伪随机数生成器
+### 3.7 伪随机数生成器
 
 头文件目录：`regadgets/prng/`
 
-#### 4.7.1 GLIBCRand
+#### 3.7.1 GLIBCRand
 
 ```cpp
 class GLIBCRand {
@@ -809,7 +783,7 @@ auto value = rng.next();
 auto seq = rng.sequence(5);
 ```
 
-#### 4.7.2 WindowsRand
+#### 3.7.2 WindowsRand
 
 ```cpp
 class WindowsRand {
@@ -829,7 +803,7 @@ auto value = rng.next();
 auto seq = rng.sequence(5);
 ```
 
-#### 4.7.3 MT19937
+#### 3.7.3 MT19937
 
 头文件：`regadgets/prng/mt19937.hpp`
 
@@ -859,7 +833,7 @@ auto first = rng.next();
 auto seq = rng.sequence(5);
 ```
 
-#### 4.7.4 MT19937Predictor
+#### 3.7.4 MT19937Predictor
 
 ```cpp
 class MT19937Predictor {
@@ -897,7 +871,7 @@ if (predictor.ready()) {
 }
 ```
 
-### 4.8 逆向工程辅助工具
+### 3.8 逆向工程辅助工具
 
 头文件：`regadgets/reverse/sbox.hpp`
 
@@ -920,9 +894,9 @@ auto transformed = sbox_transform(from_hex("00112233"), sbox);
 auto restored = sbox_transform(transformed, inverse_sbox);
 ```
 
-## 5. 模式与 Padding 约定
+## 4. 模式与 Padding 约定
 
-### 5.1 `block_mode`
+### 4.1 `block_mode`
 
 可选模式：
 
@@ -937,7 +911,7 @@ enum class block_mode {
 };
 ```
 
-### 5.2 默认 padding 行为
+### 4.2 默认 padding 行为
 
 默认自动 `PKCS#7` padding 的接口：
 
@@ -961,18 +935,18 @@ enum class block_mode {
 - `chacha20_crypt`
 - 哈希与编码类接口
 
-## 6. 示例代码位置
+## 5. 示例代码位置
 
 可以直接参考：
 
 - [examples/demo.cpp](D:\Project\regadgets_cpp\examples\demo.cpp)
 - [tests/smoke_test.cpp](D:\Project\regadgets_cpp\tests\smoke_test.cpp)
 
-## 7. 注意事项
 
-- 绝大部分接口使用 `bytes` 作为输入输出，调用前通常用 `from_string` / `from_hex` 做转换。
-- 若你处理的是文本，解密后通常用 `to_string(...)` 转回字符串。
-- 块密码如果使用 `cbc/cfb/ofb/ctr`，请显式提供合适长度的 `iv`。
-- Base2048 只有在开启 `REGADGETS_ENABLE_BASE2048` 时可用。
+
+  绝大部分接口使用 `bytes` 作为输入输出，调用前通常用 `from_string` / `from_hex` 做转换。
+  若你处理的是文本，解密后通常用 `to_string(...)` 转回字符串。
+  块密码如果使用 `cbc/cfb/ofb/ctr`，请显式提供合适长度的 `iv`。
+  Base2048 只有在开启 `REGADGETS_ENABLE_BASE2048` 时可用。
 
 
